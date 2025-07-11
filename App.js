@@ -1,69 +1,43 @@
-import { Button, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {  FlatList, StyleSheet,  View } from "react-native";
 import { useState } from "react";
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
+
 export default function App() {
-  const [enteredGoalText, setEnteredGoalText] =  useState('')
-  const [goals, setGoals] = useState([])
-  function goalInputHandler(text){
-    setEnteredGoalText(text)
-  }
-  function addGoalHandler(){
-    setGoals( (prevGoals)=> [...prevGoals, enteredGoalText])
+  const [goals, setGoals] = useState([]);
+
+  function addGoalHandler(enteredGoalText) {
+    setGoals((prevGoals) => [
+      ...prevGoals,
+      { text: enteredGoalText, id: new Date() },
+    ]);
   }
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.textInput} placeholder="Enter your goal here..." onChangeText={goalInputHandler}/>
-        <View>
-        <Button title="Add Goal" onPress={addGoalHandler}/>
-        </View>
-      </View>
+      <GoalInput onAddGoal={addGoalHandler} />
       <View style={styles.goalsContainer}>
-      <ScrollView >
-        {
-          goals.map( (goal, index)=>(
-            // GIVING INDEX AS A KEY NOT GOOD BECAUSE IF YOU DELETE ONE VALUE IN THE ARRAY THEN ALL LIST SHOULD RE-INDEXING ALL VALUES. IT IS PROBLEM***
-            <View key={index} style={styles.goalItem}>
-            <Text style={{color: "#FFF"}}>{goal}</Text>
-            </View>
-              
-          ))
-        }
-      </ScrollView>
+        <FlatList
+          data={goals}
+          keyExtractor={(item) => {
+            return item.id;
+          }}
+          renderItem={(item) => {
+            return <GoalItem text={item.item.text} />;
+          }}
+        />
       </View>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     paddingTop: 50,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
   },
-  inputContainer: {
-    flex:1,
-    flexDirection: "row",
-    justifyContent: 'space-between',
-    alignItems: "center",
-    marginBottom: 24,
-    borderBottomWidth: 1,
-    borderColor: "#cccccc"
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: "#cccccc",
-    width: "70%",
-    marginRight: 8,
-    padding: 8
-  },
+
   goalsContainer: {
-    flex: 5
+    flex: 5,
   },
-  goalItem: {
-    margin: 8,
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: "#3f37c9",
-  }
 });
